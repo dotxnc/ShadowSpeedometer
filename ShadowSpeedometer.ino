@@ -1,4 +1,5 @@
 
+
 #include <U8glib.h>
 #include <TinyGPS++.h>
 #include <SoftwareSerial.h>
@@ -19,9 +20,9 @@ int mph = 0;
 int top_speed = 0;
 bool dst = true;
 
-#define imageWidth 20
-#define imageHeight 21
-const unsigned char bitmap [] PROGMEM=
+#define weewoo_bmp_width 20
+#define weewoo_bmp_height 21
+const unsigned char weewoo_bmp [] PROGMEM=
 {
   0x18, 0x86, 0x01, 0xfc, 0xff, 0x03, 0xfe, 0xff, 0x07, 0xfc,
   0xff, 0x07, 0xfc, 0xff, 0x03, 0xfc, 0xff, 0x03, 0xfc, 0xf9,
@@ -43,6 +44,36 @@ void draw(void)
 {
   u8g.setFont(u8g_font_unifont);
 
+  // Draw border
+  u8g.drawLine(0, 0, 128, 0); // top
+  u8g.drawLine(0, 63, 128, 63); // bottom
+  u8g.drawLine(0, 0, 0, 64); // left
+  u8g.drawLine(127, 0, 127, 64); // right
+
+  // Show number of connected satellites
+  u8g.drawStr(110, 16, sat_count_buffer);
+
+  // Show speed
+  u8g.drawStr(0, 16, speed_buffer);
+
+  // Show top speed
+  u8g.drawStr(0, 32, top_speed_buffer);
+
+  // Show time
+  u8g.drawStr(1, 48, time_buffer);
+
+  // Going too fast, display the weewoo
+  if (mph > 85)
+    u8g.drawXBMP(90, 25, weewoo_bmp_width, weewoo_bmp_height, weewoo_bmp);
+}
+
+void draw_v2()
+{
+
+}
+
+void update_info()
+{
   // sprintf is slow as fuck
   // only update strings if the gps has pulled new data
   if (gps.speed.isUpdated())
@@ -73,28 +104,6 @@ void draw(void)
     Serial.println(gps.satellites.value());
     sprintf(sat_count_buffer, "%2d", gps.satellites.value());
   }
-
-  // Draw border
-  u8g.drawLine(0, 0, 128, 0); // top
-  u8g.drawLine(0, 63, 128, 63); // bottom
-  u8g.drawLine(0, 0, 0, 64); // left
-  u8g.drawLine(127, 0, 127, 64); // right
-
-  // Show number of connected satellites
-  u8g.drawStr(110, 16, sat_count_buffer);
-
-  // Show speed
-  u8g.drawStr(0, 16, speed_buffer);
-
-  // Show top speed
-  u8g.drawStr(0, 32, top_speed_buffer);
-
-  // Show time
-  u8g.drawStr(1, 48, time_buffer);
-
-  // Going too fast, display the weewoo
-  if (mph > 85)
-    u8g.drawXBMP(90, 25, imageWidth, imageHeight, bitmap);
 }
 
 void setup(void)
@@ -119,6 +128,7 @@ void loop(void)
     while (gpsSerial.available()) {
       gps.encode(gpsSerial.read());
     }
+    update_info();
     //
     draw();
   } while( u8g.nextPage() );

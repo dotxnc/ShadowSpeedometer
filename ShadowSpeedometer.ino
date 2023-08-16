@@ -217,7 +217,7 @@ const u8g_fntpgm_uint8_t creep2[2451] U8G_FONT_SECTION("creep2") = {
 
 int timezone_correct(int hour)
 {
-  if (hour > 4)
+  if (hour > 3)
     return hour-4;
   return (23+hour)-4;
 }
@@ -281,8 +281,8 @@ void update_info()
   {
     // All of this is hacky as fuck
     int h = timezone_correct(gps.time.hour());
-    if (dst && h > 12) h++;
-    sprintf(time_buffer, "%02d:%02d %s", h > 12 ? h-12 : h, gps.time.minute(), h > 12 ? "pm": "am");
+    if (dst && h >= 12) h++;
+    sprintf(time_buffer, "%02d:%02d %s", h > 12 ? h-12 : h, gps.time.minute(), h >= 12 ? "pm": "am");
   }
 
   if (gps.satellites.isUpdated())

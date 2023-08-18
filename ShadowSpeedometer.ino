@@ -5,9 +5,9 @@
 #include <TinyGPS++.h>
 #include <SoftwareSerial.h>
 
-U8GLIB_SSD1309_128X64 u8g(7, 6, 4, 5);
+U8GLIB_SSD1309_128X64 u8g(5, 6, 8, 7);
 
-SoftwareSerial gpsSerial(10, 11);
+SoftwareSerial gpsSerial(4, 3);
 TinyGPSPlus gps;
 
 // These use a lot of memory, might need to trim it down
@@ -319,5 +319,7 @@ void loop(void)
     //
     draw();
   } while( u8g.nextPage() );
+
+  delay(50);
 }
 
